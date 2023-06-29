@@ -52,7 +52,7 @@ export default function SimulationControls(props: SimulationControlsProps) {
     const formatTimeStamp = (value: number): string => {
         if (start !== undefined) {
             let date = start.add(value, "s");
-            return date.format("DD.MM.YYYY HH:mm");
+            return date.format("DD.MM.YYYY HH:mm:ss");
         }
         return value.toString();
     }

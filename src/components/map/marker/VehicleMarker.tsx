@@ -23,7 +23,7 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
     const [, setRoutePoints] = useState<Array<LatLngTuple>>([]);
     const [start, setStart] = useState<LatLngTuple>([movementLog[0][3], movementLog[0][4]]);
     const [target, setTarget] = useState<LatLngTuple>([movementLog[0][3], movementLog[0][4]]);
-    const [color, setColor] = useState<string>("#2A81CB");
+    const [color, setColor] = useState<string>(colorIdle);
     const [movementDuration, setMovementDuration] = useState(1000);
 
     const interpolatePoints = (start: LatLngTuple, end: LatLngTuple, duration: number): Array<LatLngTuple> => {
@@ -70,8 +70,8 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
             const startTime = entry[1];
             const endTime = entry[2];
             if (startTime <= newTime.time && endTime >= newTime.time) {
-                const duration = entry[2] - entry[1];
-                const passedDuration = newTime.time - entry[1];
+                const duration = endTime - startTime;
+                const passedDuration = newTime.time - startTime;
                 let currentRoutePoints = interpolatePoints([entry[3], entry[4]],
                     [entry[5], entry[6]], duration);
                 currentRoutePoints = currentRoutePoints.slice(passedDuration);

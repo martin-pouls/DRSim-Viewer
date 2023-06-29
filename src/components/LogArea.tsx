@@ -35,7 +35,7 @@ export default function LogArea(props: LogAreaProps) {
         }
         if (start) {
             let date = start.add(entry[1], "s");
-            setText((previous) => date.format("DD.MM.YYYY HH:mm\t") + message + "\n" + previous);
+            setText((previous) => date.format("DD.MM.YYYY HH:mm:ss  ") + message + "\n" + previous);
         }
     }
 

@@ -104,7 +104,7 @@ export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
                     Papa.parse(file, {delimiter: ";", complete: onVehiclesStatesRead, dynamicTyping: true, worker: true});
                 } else if (file.name === "requestLog.csv") {
                     Papa.parse(file, {delimiter: ";", complete: onRequestLogRead, dynamicTyping: true, worker: true});
-                } else {
+                } else if (file.name === "simulationLog.json") {
                     readSimulationLog(file);
                 }
             }

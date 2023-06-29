@@ -13,7 +13,6 @@ type MapProps = {
 export default function Map(props: MapProps) {
     return (
         <MapContainer center={props.center}
-                      className={"mantine-Container-root"}
                       zoom={11}
                       scrollWheelZoom={true}
                       style={{height: "100%", width: "100%"}}>
