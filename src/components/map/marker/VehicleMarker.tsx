@@ -69,11 +69,13 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
             const entry = movementLog[i];
             const startTime = entry[1];
             const endTime = entry[2];
+            const startLocation: LatLngTuple = [entry[3], entry[4]];
+            const endLocation: LatLngTuple = [entry[5], entry[6]];
             if (startTime <= newTime.time && endTime >= newTime.time) {
                 const duration = endTime - startTime;
                 const passedDuration = newTime.time - startTime;
-                let currentRoutePoints = interpolatePoints([entry[3], entry[4]],
-                    [entry[5], entry[6]], duration);
+                let currentRoutePoints = interpolatePoints(startLocation,
+                    endLocation, duration);
                 currentRoutePoints = currentRoutePoints.slice(passedDuration);
                 setRoutePoints(currentRoutePoints);
                 setMovementLogIndex(i);
@@ -81,16 +83,14 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
                 setTarget(currentRoutePoints[0]);
                 break;
             } else if (startTime > newTime.time) {
-                const position: LatLngTuple = [entry[3], entry[4]];
-                setStart(position);
-                setTarget(position);
+                setStart(startLocation);
+                setTarget(startLocation);
                 setRoutePoints([]);
                 setMovementLogIndex(i - 1);
                 break;
             } else if (i === movementLog.length - 1) {
-                const position: LatLngTuple = [entry[5], entry[6]];
-                setStart(position);
-                setTarget(position);
+                setStart(endLocation);
+                setTarget(endLocation);
                 setRoutePoints([]);
                 setMovementLogIndex(i);
             }
@@ -125,9 +125,9 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
         if (movementLog.length > movementLogIndex + 1 && movementLog[movementLogIndex + 1][1] <= newTime.time) {
             const newIndex = movementLogIndex + 1;
             const duration = movementLog[newIndex][2] - movementLog[newIndex][1];
-            const start: LatLngTuple = [movementLog[newIndex][3], movementLog[newIndex][4]];
-            const end: LatLngTuple = [movementLog[newIndex][5], movementLog[newIndex][6]];
-            let newRoutePoints = interpolatePoints(start, end, duration);
+            const startLocation: LatLngTuple = [movementLog[newIndex][3], movementLog[newIndex][4]];
+            const endLocation: LatLngTuple = [movementLog[newIndex][5], movementLog[newIndex][6]];
+            let newRoutePoints = interpolatePoints(startLocation, endLocation, duration);
             setRoutePoints(newRoutePoints);
             setMovementLogIndex(newIndex);
             updateRoutePoints(newRoutePoints);

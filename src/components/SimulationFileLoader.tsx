@@ -10,15 +10,13 @@ type SimulationFileLoaderProps = {
     setStart: Dispatch<SetStateAction<dayjs.Dayjs | undefined>>;
     setMaxTime: Dispatch<SetStateAction<number>>;
     startLoadingCallback: () => void;
-    setLoadedFiles: Dispatch<SetStateAction<number>>;
-    setReadingFiles: Dispatch<SetStateAction<boolean>>;
+    setNumLoadedFiles: Dispatch<SetStateAction<number>>;
 }
 
 export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
     const mandatoryFiles = ["vehicleStatesLog.csv", "movementLog.csv", "requestLog.csv", "simulationLog.json"];
     const {setMovementLogByVehicle, setStateLogByVehicle, setRequestLog, startLoadingCallback,
-        setStart, setLoadedFiles,
-        setReadingFiles, setMaxTime} = props;
+        setStart, setNumLoadedFiles, setMaxTime} = props;
     const [error, setError] = useState("");
 
     const readCsvFileIntoMap = (result: ParseResult<any>): Map<number, Array<Array<any>>> => {
@@ -44,12 +42,7 @@ export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
     }
 
     const incrementLoadedFiles = () => {
-        setLoadedFiles((previous) => {
-            if (previous + 1 === 4) {
-                setReadingFiles(false);
-            }
-            return previous + 1;
-        });
+        setNumLoadedFiles(previous => previous + 1);
     }
 
     const onMovementLogRead = (result: ParseResult<any>) => {

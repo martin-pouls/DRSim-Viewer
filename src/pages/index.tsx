@@ -28,10 +28,9 @@ export default function Home() {
     const [maxTime, setMaxTime] = useState(0);
     const intervalRef = useRef<NodeJS.Timer | undefined>(undefined);
     const [readingFiles, setReadingFiles] = useState(false);
-    const [loadedFiles, setLoadedFiles] = useState(0);
+    const [numLoadedFiles, setNumLoadedFiles] = useState(0);
     const [playing, setPlaying] = useState<boolean>(false);
     const [logAreaText, setLogAreaText] = useState("");
-    const [scenarioLoaded, setScenarioLoaded] = useState(false);
     const [mapBounds, setMapBounds] = useState<LatLngTuple[]>([]);
 
     const play = () => {
@@ -63,13 +62,15 @@ export default function Home() {
         setStart(undefined);
         setTime({time: 0, jump: false});
         setReadingFiles(true);
-        setLoadedFiles(0);
+        setNumLoadedFiles(0);
         setLogAreaText("");
     }
 
     useEffect(() => {
-        setScenarioLoaded(loadedFiles === 4);
-    }, [loadedFiles]);
+        if (numLoadedFiles === 4) {
+            setReadingFiles(false);
+        }
+    }, [numLoadedFiles]);
 
     useEffect(() => {
         let newBounds: LatLngTuple[] = [];
@@ -92,14 +93,14 @@ export default function Home() {
     return (
         <>
             <LoadingOverlay visible={readingFiles} overlayBlur={2} />
+
             <SimulationFileLoader setMovementLogByVehicle={setMovementLogByVehicle}
                                   setStateLogByVehicle={setStateLogByVehicle}
                                   startLoadingCallback={onStartLoading}
-                                  setLoadedFiles={setLoadedFiles}
+                                  setNumLoadedFiles={setNumLoadedFiles}
                                   setStart={setStart}
                                   setMaxTime={setMaxTime}
-                                  setRequestLog={setRequestLog}
-                                  setReadingFiles={setReadingFiles}/>
+                                  setRequestLog={setRequestLog}/>
             <Divider my="sm" />
 
             <Grid gutter={"xs"} columns={5}>
@@ -124,7 +125,7 @@ export default function Home() {
                                 pause={pause}
                                 stopInterval={stopInterval}
                                 playing={playing}
-                                scenarioLoaded={scenarioLoaded}
+                                scenarioLoaded={numLoadedFiles === 4}
                                 start={start}
                                 maxTime={maxTime}/>
         </>
