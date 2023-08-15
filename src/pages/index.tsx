@@ -10,7 +10,7 @@ import {
 import {useAtom} from "jotai";
 import {speedAtom, timeAtom} from "@/state/atoms";
 import {useViewportSize} from "@mantine/hooks";
-import SimulationFileLoader from "@/components/SimulationFileLoader";
+import ReplayFileLoader from "@/components/loading/ReplayFileLoader";
 import dayjs from "dayjs";
 import LogArea from "@/components/LogArea";
 import SimulationControls from "@/components/SimulationControls";
@@ -21,9 +21,9 @@ export default function Home() {
     const mapHeight = height - 250;
     const [time, setTime] = useAtom(timeAtom);
     const [speed,] = useAtom(speedAtom);
-    const [movementLogByVehicle, setMovementLogByVehicle] = useState<Map<number, Array<Array<any>>>>(new Map());
-    const [stateLogByVehicle, setStateLogByVehicle] = useState<Map<number, Array<Array<any>>>>(new Map());
-    const [requestLog, setRequestLog] = useState<Array<Array<any>>>([]);
+    const [movementReplayByVehicle, setMovementReplayByVehicle] = useState<Map<number, Array<Array<any>>>>(new Map());
+    const [stateReplayByVehicle, setStateReplayByVehicle] = useState<Map<number, Array<Array<any>>>>(new Map());
+    const [requestReplay, setRequestReplay] = useState<Array<Array<any>>>([]);
     const [start, setStart] = useState<dayjs.Dayjs>();
     const [maxTime, setMaxTime] = useState(0);
     const intervalRef = useRef<NodeJS.Timer | undefined>(undefined);
@@ -56,9 +56,9 @@ export default function Home() {
 
     const onStartLoading = () => {
         pause();
-        setMovementLogByVehicle(new Map());
-        setStateLogByVehicle(new Map());
-        setRequestLog([]);
+        setMovementReplayByVehicle(new Map());
+        setStateReplayByVehicle(new Map());
+        setRequestReplay([]);
         setStart(undefined);
         setTime({time: 0, jump: false});
         setReadingFiles(true);
@@ -74,14 +74,14 @@ export default function Home() {
 
     useEffect(() => {
         let newBounds: LatLngTuple[] = [];
-        for (let key of movementLogByVehicle.keys()) {
-            const entry = movementLogByVehicle.get(key);
+        for (let key of movementReplayByVehicle.keys()) {
+            const entry = movementReplayByVehicle.get(key);
             if (entry !== undefined) {
                 newBounds.push([entry[0][3], entry[0][4]]);
             }
         }
         setMapBounds(newBounds);
-    }, [movementLogByVehicle]);
+    }, [movementReplayByVehicle]);
 
     useEffect(() => {
         if (time.time >= maxTime) {
@@ -94,13 +94,13 @@ export default function Home() {
         <>
             <LoadingOverlay visible={readingFiles} overlayBlur={2} />
 
-            <SimulationFileLoader setMovementLogByVehicle={setMovementLogByVehicle}
-                                  setStateLogByVehicle={setStateLogByVehicle}
-                                  startLoadingCallback={onStartLoading}
-                                  setNumLoadedFiles={setNumLoadedFiles}
-                                  setStart={setStart}
-                                  setMaxTime={setMaxTime}
-                                  setRequestLog={setRequestLog}/>
+            <ReplayFileLoader setMovementReplayByVehicle={setMovementReplayByVehicle}
+                              setStateReplayByVehicle={setStateReplayByVehicle}
+                              startLoadingCallback={onStartLoading}
+                              setNumLoadedFiles={setNumLoadedFiles}
+                              setStart={setStart}
+                              setMaxTime={setMaxTime}
+                              setRequestReplay={setRequestReplay}/>
             <Divider my="sm" />
 
             <Grid gutter={"xs"} columns={5}>
@@ -108,14 +108,14 @@ export default function Home() {
                     <div id={"map"} style={{height: mapHeight, width: "100%"}}>
                         <MapNoSsr mapDivId={"map"}
                                   center={[49.01354763997843, 8.404416765869655]}>
-                            <VehicleLayerNoSsr movementLogByVehicle={movementLogByVehicle}
-                                               stateLogByVehicle={stateLogByVehicle}/>
+                            <VehicleLayerNoSsr movementReplayByVehicle={movementReplayByVehicle}
+                                               stateReplayByVehicle={stateReplayByVehicle}/>
                             <FitBoundsControlNoSsr bounds={mapBounds}/>
                         </MapNoSsr>
                     </div>
                 </Grid.Col>
                 <Grid.Col span={1}>
-                    <LogArea requestLog={requestLog} start={start} setText={setLogAreaText} text={logAreaText}/>
+                    <LogArea requestReplay={requestReplay} start={start} setText={setLogAreaText} text={logAreaText}/>
                 </Grid.Col>
             </Grid>
 

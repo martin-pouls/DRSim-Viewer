@@ -7,14 +7,14 @@ import {timeAtom} from "@/state/atoms";
 import {SimulationTime} from "@/models/time";
 
 type LogAreaProps = {
-    requestLog: Array<Array<any>>;
+    requestReplay: Array<Array<any>>;
     start: dayjs.Dayjs | undefined;
     text: string;
     setText: Dispatch<SetStateAction<string>>;
 }
 
 export default function LogArea(props: LogAreaProps) {
-    const {requestLog, start, text, setText} = props;
+    const {requestReplay, start, text, setText} = props;
     const { height } = useViewportSize();
     const textAreaHeight = height - 250;
     const maxRows = textAreaHeight / 24;
@@ -41,20 +41,20 @@ export default function LogArea(props: LogAreaProps) {
 
     const jumpInTime = (newTime: SimulationTime) => {
         setText("");
-        for (let i = 0; i < requestLog.length; ++i) {
-            if (requestLog[i][1] > newTime.time) {
+        for (let i = 0; i < requestReplay.length; ++i) {
+            if (requestReplay[i][1] > newTime.time) {
                 setLogIndex(Math.max(0, i - 1));
                 break;
             }
-            if (i == requestLog.length - 1) {
-                setLogIndex(requestLog.length);
+            if (i == requestReplay.length - 1) {
+                setLogIndex(requestReplay.length);
             }
         }
     }
 
     const stepInTime = (newTime: SimulationTime) => {
-        if (logIndex + 1 < requestLog.length - 1 && requestLog[logIndex + 1][1] <= newTime.time) {
-            logRequest(requestLog[logIndex + 1]);
+        if (logIndex + 1 < requestReplay.length - 1 && requestReplay[logIndex + 1][1] <= newTime.time) {
+            logRequest(requestReplay[logIndex + 1]);
             setLogIndex(logIndex + 1);
         }
     }

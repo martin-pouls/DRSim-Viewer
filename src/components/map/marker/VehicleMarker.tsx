@@ -7,22 +7,22 @@ import {SimulationTime} from "@/models/time";
 
 type VehicleMarkerProps = {
     vehicleId: number;
-    movementLog: Array<Array<any>>;
-    stateLog: Array<Array<any>>;
+    movementReplay: Array<Array<any>>;
+    stateReplay: Array<Array<any>>;
 }
 
 export default function VehicleMarker(props: VehicleMarkerProps) {
     const colorIdle = "#5778a4";
     const colorActive = "#6a9f58";
     const colorRepositioning = "#e49444";
-    const {movementLog, stateLog} = props;
+    const {movementReplay, stateReplay} = props;
     const [time,] = useAtom(timeAtom);
     const [speed,] = useAtom(speedAtom);
     const [movementLogIndex, setMovementLogIndex] = useState(0);
     const [stateLogIndex, setStateLogIndex] = useState(0);
     const [, setRoutePoints] = useState<Array<LatLngTuple>>([]);
-    const [start, setStart] = useState<LatLngTuple>([movementLog[0][3], movementLog[0][4]]);
-    const [target, setTarget] = useState<LatLngTuple>([movementLog[0][3], movementLog[0][4]]);
+    const [start, setStart] = useState<LatLngTuple>([movementReplay[0][3], movementReplay[0][4]]);
+    const [target, setTarget] = useState<LatLngTuple>([movementReplay[0][3], movementReplay[0][4]]);
     const [color, setColor] = useState<string>(colorIdle);
     const [movementDuration, setMovementDuration] = useState(1000);
 
@@ -50,14 +50,14 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
     }
 
     const jumpState = (newTime: SimulationTime) => {
-        for (let i = 0; i < stateLog.length; ++i) {
-            const entry = stateLog[i];
+        for (let i = 0; i < stateReplay.length; ++i) {
+            const entry = stateReplay[i];
             if (entry[1] > newTime.time) {
-                const previousEntry = stateLog[i - 1];
+                const previousEntry = stateReplay[i - 1];
                 updateColorByState(previousEntry[2]);
                 setStateLogIndex(i - 1);
                 break;
-            } else if (i === stateLog.length - 1) {
+            } else if (i === stateReplay.length - 1) {
                 updateColorByState(entry[2]);
                 setStateLogIndex(i);
             }
@@ -65,8 +65,8 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
     }
 
     const jumpMovement = (newTime: SimulationTime) => {
-        for (let i = 0; i < movementLog.length; i++) {
-            const entry = movementLog[i];
+        for (let i = 0; i < movementReplay.length; i++) {
+            const entry = movementReplay[i];
             const startTime = entry[1];
             const endTime = entry[2];
             const startLocation: LatLngTuple = [entry[3], entry[4]];
@@ -88,7 +88,7 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
                 setRoutePoints([]);
                 setMovementLogIndex(i - 1);
                 break;
-            } else if (i === movementLog.length - 1) {
+            } else if (i === movementReplay.length - 1) {
                 setStart(endLocation);
                 setTarget(endLocation);
                 setRoutePoints([]);
@@ -104,8 +104,8 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
     }
 
     const stepState = (newTime: SimulationTime) => {
-        if (stateLog.length > stateLogIndex + 1 && stateLog[stateLogIndex + 1][1] <= newTime.time) {
-            updateColorByState(stateLog[stateLogIndex + 1][2]);
+        if (stateReplay.length > stateLogIndex + 1 && stateReplay[stateLogIndex + 1][1] <= newTime.time) {
+            updateColorByState(stateReplay[stateLogIndex + 1][2]);
             setStateLogIndex(stateLogIndex + 1);
         }
     }
@@ -122,11 +122,11 @@ export default function VehicleMarker(props: VehicleMarkerProps) {
     }
 
     const stepMovement = (newTime: SimulationTime) => {
-        if (movementLog.length > movementLogIndex + 1 && movementLog[movementLogIndex + 1][1] <= newTime.time) {
+        if (movementReplay.length > movementLogIndex + 1 && movementReplay[movementLogIndex + 1][1] <= newTime.time) {
             const newIndex = movementLogIndex + 1;
-            const duration = movementLog[newIndex][2] - movementLog[newIndex][1];
-            const startLocation: LatLngTuple = [movementLog[newIndex][3], movementLog[newIndex][4]];
-            const endLocation: LatLngTuple = [movementLog[newIndex][5], movementLog[newIndex][6]];
+            const duration = movementReplay[newIndex][2] - movementReplay[newIndex][1];
+            const startLocation: LatLngTuple = [movementReplay[newIndex][3], movementReplay[newIndex][4]];
+            const endLocation: LatLngTuple = [movementReplay[newIndex][5], movementReplay[newIndex][6]];
             let newRoutePoints = interpolatePoints(startLocation, endLocation, duration);
             setRoutePoints(newRoutePoints);
             setMovementLogIndex(newIndex);

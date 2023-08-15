@@ -3,19 +3,19 @@ import React, {Dispatch, SetStateAction, useState} from "react";
 import Papa, {ParseResult} from "papaparse";
 import dayjs from "dayjs";
 
-type SimulationFileLoaderProps = {
-    setMovementLogByVehicle: (value: Map<number, Array<Array<any>>>) => void;
-    setStateLogByVehicle: (value: Map<number, Array<Array<any>>>) => void;
-    setRequestLog: Dispatch<SetStateAction<Array<Array<any>>>>;
+type ReplayFileLoaderProps = {
+    setMovementReplayByVehicle: (value: Map<number, Array<Array<any>>>) => void;
+    setStateReplayByVehicle: (value: Map<number, Array<Array<any>>>) => void;
+    setRequestReplay: Dispatch<SetStateAction<Array<Array<any>>>>;
     setStart: Dispatch<SetStateAction<dayjs.Dayjs | undefined>>;
     setMaxTime: Dispatch<SetStateAction<number>>;
     startLoadingCallback: () => void;
     setNumLoadedFiles: Dispatch<SetStateAction<number>>;
 }
 
-export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
-    const mandatoryFiles = ["vehicleStatesLog.csv", "movementLog.csv", "requestLog.csv", "simulationLog.json"];
-    const {setMovementLogByVehicle, setStateLogByVehicle, setRequestLog, startLoadingCallback,
+export default function ReplayFileLoader(props: ReplayFileLoaderProps) {
+    const mandatoryFiles = ["vehicleStatesReplay.csv", "vehicleMovementReplay.csv", "requestReplay.csv", "simulation.json"];
+    const {setMovementReplayByVehicle, setStateReplayByVehicle, setRequestReplay, startLoadingCallback,
         setStart, setNumLoadedFiles, setMaxTime} = props;
     const [error, setError] = useState("");
 
@@ -45,20 +45,20 @@ export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
         setNumLoadedFiles(previous => previous + 1);
     }
 
-    const onMovementLogRead = (result: ParseResult<any>) => {
+    const onMovementReplayRead = (result: ParseResult<any>) => {
         const map = readCsvFileIntoMap(result);
-        setMovementLogByVehicle(map);
+        setMovementReplayByVehicle(map);
         incrementLoadedFiles();
     }
 
     const onVehiclesStatesRead = (result: ParseResult<any>) => {
         const map = readCsvFileIntoMap(result);
-        setStateLogByVehicle(map);
+        setStateReplayByVehicle(map);
         incrementLoadedFiles();
     }
 
-    const onRequestLogRead = (result: ParseResult<any>) => {
-        setRequestLog(result.data);
+    const onRequestReplayRead = (result: ParseResult<any>) => {
+        setRequestReplay(result.data);
         incrementLoadedFiles();
     }
 
@@ -75,7 +75,7 @@ export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
         return true;
     }
 
-    const readSimulationLog = (file: File) => {
+    const readSimulationJson = (file: File) => {
         file.text().then((value: string) => {
             const simulationLog = JSON.parse(value);
             let start = dayjs(simulationLog.start);
@@ -91,14 +91,14 @@ export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
             startLoadingCallback();
             setError("");
             for (const file of files) {
-                if (file.name === "movementLog.csv") {
-                    Papa.parse(file, {delimiter: ";", complete: onMovementLogRead, dynamicTyping: true, worker: true});
-                } else if (file.name === "vehicleStatesLog.csv") {
+                if (file.name === "vehicleMovementReplay.csv") {
+                    Papa.parse(file, {delimiter: ";", complete: onMovementReplayRead, dynamicTyping: true, worker: true});
+                } else if (file.name === "vehicleStatesReplay.csv") {
                     Papa.parse(file, {delimiter: ";", complete: onVehiclesStatesRead, dynamicTyping: true, worker: true});
-                } else if (file.name === "requestLog.csv") {
-                    Papa.parse(file, {delimiter: ";", complete: onRequestLogRead, dynamicTyping: true, worker: true});
-                } else if (file.name === "simulationLog.json") {
-                    readSimulationLog(file);
+                } else if (file.name === "requestReplay.csv") {
+                    Papa.parse(file, {delimiter: ";", complete: onRequestReplayRead, dynamicTyping: true, worker: true});
+                } else if (file.name === "simulation.json") {
+                    readSimulationJson(file);
                 }
             }
         } else {
@@ -110,8 +110,8 @@ export default function SimulationFileLoader(props: SimulationFileLoaderProps) {
         <Group>
             <FileInput
                 placeholder=""
-                description={`Select your simulation scenario files (${mandatoryFiles.join(", ")}).`}
-                label="Simulation scenario"
+                description={`Select your simulation replay files (${mandatoryFiles.join(", ")}).`}
+                label="Simulation replay"
                 accept="application/csv"
                 multiple
                 error={error}
