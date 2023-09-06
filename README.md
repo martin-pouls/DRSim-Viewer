@@ -16,7 +16,12 @@ pnpm run dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the viewer.
 
 ## Running with Docker
-You can also run the viewer with Docker as follows:
+You can also run the viewer with Docker from Docker Hub:
+```bash
+docker run -p 3000:3000 martinpouls/drsim-viewer
+```
+
+Or build the image yourself:
 ```bash
 docker build -t drsim-viewer .
 docker run -p 3000:3000 drsim-viewer
